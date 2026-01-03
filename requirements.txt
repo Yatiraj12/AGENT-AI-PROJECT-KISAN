@@ -1,0 +1,26 @@
+# Core
+fastapi
+uvicorn
+
+# Image processing
+opencv-python
+pillow
+numpy
+
+# ML / AI (model-agnostic for now)
+tensorflow
+
+# Data handling
+pydantic
+python-dotenv
+
+# Utilities
+requests
+loguru
+
+# Testing
+pytest
+groq
+python-multipart
+python-dotenv
+sqlalchemy

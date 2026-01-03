@@ -1,0 +1,15 @@
+{
+  "Early Blight": {
+    "treatment": [
+      "Remove infected leaves",
+      "Apply copper-based fungicide"
+    ],
+    "advanced_treatment": [
+      "Use chlorothalonil fungicide"
+    ],
+    "prevention": [
+      "Crop rotation",
+      "Avoid overhead irrigation"
+    ]
+  }
+}

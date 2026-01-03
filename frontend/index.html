@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crop Disease AI Agent</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Crop Disease AI Agent</h1>
+    <p>Upload a crop leaf image to get disease analysis and treatment advice</p>
+
+    <form id="analyzeForm">
+        <label>Crop Name</label>
+        <input type="text" id="crop" placeholder="e.g. Tomato" required>
+
+        <label>Language</label>
+        <select id="language">
+            <option value="en">English</option>
+            <option value="kn">Kannada</option>
+            <option value="hi">Hindi</option>
+        </select>
+
+        <label>Upload Leaf Image</label>
+        <input type="file" id="image" accept="image/*" required>
+
+        <button type="submit">Analyze</button>
+    </form>
+
+    <div id="loading" class="hidden">Analyzing image...</div>
+
+    <div id="result" class="hidden">
+        <h2>Analysis Result</h2>
+
+        <p><strong>Disease:</strong> <span id="disease"></span></p>
+        <p><strong>Confidence:</strong> <span id="confidence"></span></p>
+        <p><strong>Severity:</strong> <span id="severity"></span></p>
+
+        <p><strong>Explanation:</strong></p>
+        <p id="explanation"></p>
+
+        <p><strong>Treatment:</strong></p>
+        <ul id="treatment"></ul>
+
+        <p><strong>Prevention:</strong></p>
+        <ul id="prevention"></ul>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
