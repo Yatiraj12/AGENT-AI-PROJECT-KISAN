@@ -5,8 +5,8 @@ const result = document.getElementById("result");
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    result.classList.add("hidden");
     loading.classList.remove("hidden");
+    result.classList.add("hidden");
 
     const crop = document.getElementById("crop").value;
     const language = document.getElementById("language").value;
@@ -30,7 +30,7 @@ form.addEventListener("submit", async (e) => {
             (data.disease.confidence * 100).toFixed(1) + "%";
 
         document.getElementById("severity").innerText =
-            data.severity.risk_level + " (" + data.severity.severity_percent + "%)";
+            `${data.severity.risk_level} (${data.severity.severity_percent}%)`;
 
         document.getElementById("explanation").innerText =
             data.disease.explanation || "No explanation available";
@@ -54,9 +54,9 @@ form.addEventListener("submit", async (e) => {
         loading.classList.add("hidden");
         result.classList.remove("hidden");
 
-    } catch (error) {
+    } catch (err) {
         loading.classList.add("hidden");
-        alert("Error analyzing image. Please try again.");
-        console.error(error);
+        alert("Something went wrong. Please try again.");
+        console.error(err);
     }
 });

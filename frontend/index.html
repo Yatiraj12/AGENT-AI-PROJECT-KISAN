@@ -2,51 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crop Disease AI Agent</title>
+    <title>Crop Disease AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <h1>Crop Disease AI Agent</h1>
-    <p>Upload a crop leaf image to get disease analysis and treatment advice</p>
+<div class="background-overlay"></div>
 
-    <form id="analyzeForm">
-        <label>Crop Name</label>
-        <input type="text" id="crop" placeholder="e.g. Tomato" required>
+<main class="app-container">
 
-        <label>Language</label>
-        <select id="language">
-            <option value="en">English</option>
-            <option value="kn">Kannada</option>
-            <option value="hi">Hindi</option>
-        </select>
+    <section class="glass-card">
+        <h1>Crop Disease AI</h1>
+        <p class="subtitle">
+            AI-powered crop health analysis for farmers
+        </p>
 
-        <label>Upload Leaf Image</label>
-        <input type="file" id="image" accept="image/*" required>
+        <form id="analyzeForm">
+            <div class="form-group">
+                <label>Crop Name</label>
+                <input type="text" id="crop" placeholder="Example: Tomato, Jowar" required>
+            </div>
 
-        <button type="submit">Analyze</button>
-    </form>
+            <div class="form-group">
+                <label>Language</label>
+                <select id="language">
+                    <option value="en">English</option>
+                    <option value="kn">Kannada</option>
+                    <option value="hi">Hindi</option>
+                </select>
+            </div>
 
-    <div id="loading" class="hidden">Analyzing image...</div>
+            <div class="form-group">
+                <label>Upload Leaf Image</label>
+                <input type="file" id="image" accept="image/*" required>
+            </div>
 
-    <div id="result" class="hidden">
+            <button type="submit" class="btn-primary">
+                Analyze Crop
+            </button>
+        </form>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Analyzing image...</p>
+        </div>
+    </section>
+
+    <section id="result" class="glass-card hidden">
         <h2>Analysis Result</h2>
 
         <p><strong>Disease:</strong> <span id="disease"></span></p>
         <p><strong>Confidence:</strong> <span id="confidence"></span></p>
         <p><strong>Severity:</strong> <span id="severity"></span></p>
 
-        <p><strong>Explanation:</strong></p>
+        <h3>Explanation</h3>
         <p id="explanation"></p>
 
-        <p><strong>Treatment:</strong></p>
+        <h3>Treatment</h3>
         <ul id="treatment"></ul>
 
-        <p><strong>Prevention:</strong></p>
+        <h3>Prevention</h3>
         <ul id="prevention"></ul>
-    </div>
-</div>
+    </section>
+
+</main>
 
 <script src="script.js"></script>
 </body>
