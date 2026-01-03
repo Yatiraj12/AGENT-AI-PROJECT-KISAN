@@ -12,32 +12,49 @@ form.addEventListener("submit", async (e) => {
     const language = document.getElementById("language").value;
     const imageFile = document.getElementById("image").files[0];
 
+    if (!imageFile) {
+        alert("Please upload an image.");
+        loading.classList.add("hidden");
+        return;
+    }
+
     const formData = new FormData();
     formData.append("crop", crop);
     formData.append("language", language);
     formData.append("file", imageFile);
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/analyze/image", {
+        // ✅ Vercel-compatible API call (relative path)
+        const response = await fetch("/analyze/image", {
             method: "POST",
             body: formData
         });
 
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
         const data = await response.json();
 
-        document.getElementById("disease").innerText = data.disease.disease;
+        document.getElementById("disease").innerText =
+            data.disease?.disease || "Unknown";
+
         document.getElementById("confidence").innerText =
-            (data.disease.confidence * 100).toFixed(1) + "%";
+            data.disease?.confidence
+                ? (data.disease.confidence * 100).toFixed(1) + "%"
+                : "N/A";
 
         document.getElementById("severity").innerText =
-            `${data.severity.risk_level} (${data.severity.severity_percent}%)`;
+            data.severity
+                ? `${data.severity.risk_level} (${data.severity.severity_percent}%)`
+                : "N/A";
 
         document.getElementById("explanation").innerText =
-            data.disease.explanation || "No explanation available";
+            data.disease?.explanation || "No explanation available";
 
         const treatmentList = document.getElementById("treatment");
         treatmentList.innerHTML = "";
-        data.solution.treatment.forEach(item => {
+        (data.solution?.treatment || []).forEach(item => {
             const li = document.createElement("li");
             li.innerText = item;
             treatmentList.appendChild(li);
@@ -45,7 +62,7 @@ form.addEventListener("submit", async (e) => {
 
         const preventionList = document.getElementById("prevention");
         preventionList.innerHTML = "";
-        data.solution.prevention.forEach(item => {
+        (data.solution?.prevention || []).forEach(item => {
             const li = document.createElement("li");
             li.innerText = item;
             preventionList.appendChild(li);
@@ -56,7 +73,7 @@ form.addEventListener("submit", async (e) => {
 
     } catch (err) {
         loading.classList.add("hidden");
-        alert("Something went wrong. Please try again.");
-        console.error(err);
+        alert("Unable to analyze image. Please try again later.");
+        console.error("Analysis error:", err);
     }
 });
