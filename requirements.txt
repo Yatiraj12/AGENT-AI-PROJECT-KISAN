@@ -1,26 +1,9 @@
-# Core
 fastapi
-
-
-# Image processing
-opencv-python
+uvicorn
+pydantic
+python-multipart
+sqlalchemy
+groq
 pillow
 numpy
-
-# ML / AI (model-agnostic for now)
-tensorflow
-
-# Data handling
-pydantic
 python-dotenv
-
-# Utilities
-requests
-loguru
-
-# Testing
-pytest
-groq
-python-multipart
-python-dotenv
-sqlalchemy
