@@ -36,3 +36,6 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+@app.get("/")
+def root():
+    return {"message": "Crop Disease AI Agent running"}
