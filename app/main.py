@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import router as disease_router
-from app.utils.db import engine, Base
 
 
 def create_app() -> FastAPI:
@@ -20,10 +19,13 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # 🔥 THIS IS THE KEY LINE
-    Base.metadata.create_all(bind=engine)
-
+    # Routers
     app.include_router(disease_router)
+
+    # Root endpoint (IMPORTANT for Wasmer / health checks)
+    @app.get("/")
+    def root():
+        return {"message": "Crop Disease AI Agent running"}
 
     @app.get("/health")
     def health_check():
@@ -36,6 +38,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-@app.get("/")
-def root():
-    return {"message": "Crop Disease AI Agent running"}
