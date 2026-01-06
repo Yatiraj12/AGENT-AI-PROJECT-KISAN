@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+import traceback
 
 from app.api.routes import router as disease_router
 
@@ -14,7 +15,7 @@ def create_app() -> FastAPI:
     )
 
     # -------------------------
-    # CORS (keep as-is)
+    # CORS (UNCHANGED)
     # -------------------------
     app.add_middleware(
         CORSMiddleware,
@@ -25,7 +26,20 @@ def create_app() -> FastAPI:
     )
 
     # -------------------------
-    # Serve frontend (NEW)
+    # GLOBAL EXCEPTION HANDLER (NEW)
+    # -------------------------
+    @app.exception_handler(Exception)
+    async def global_exception_handler(request: Request, exc: Exception):
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": str(exc),
+                "trace": traceback.format_exc()
+            }
+        )
+
+    # -------------------------
+    # Serve frontend (UNCHANGED)
     # -------------------------
     app.mount(
         "/static",
@@ -38,12 +52,12 @@ def create_app() -> FastAPI:
         return FileResponse("frontend/index.html")
 
     # -------------------------
-    # Routers (keep as-is)
+    # Routers (UNCHANGED)
     # -------------------------
     app.include_router(disease_router)
 
     # -------------------------
-    # Health check (keep as-is)
+    # Health check (UNCHANGED)
     # -------------------------
     @app.get("/health")
     def health_check():
