@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from app.api.routes import router as disease_router
 
@@ -11,6 +13,9 @@ def create_app() -> FastAPI:
         version="1.0.0"
     )
 
+    # -------------------------
+    # CORS (keep as-is)
+    # -------------------------
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -19,14 +24,27 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Routers
+    # -------------------------
+    # Serve frontend (NEW)
+    # -------------------------
+    app.mount(
+        "/static",
+        StaticFiles(directory="frontend"),
+        name="static"
+    )
+
+    @app.get("/")
+    def serve_frontend():
+        return FileResponse("frontend/index.html")
+
+    # -------------------------
+    # Routers (keep as-is)
+    # -------------------------
     app.include_router(disease_router)
 
-    # Root endpoint (IMPORTANT for Wasmer / health checks)
-    @app.get("/")
-    def root():
-        return {"message": "Crop Disease AI Agent running"}
-
+    # -------------------------
+    # Health check (keep as-is)
+    # -------------------------
     @app.get("/health")
     def health_check():
         return {

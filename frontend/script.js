@@ -2,6 +2,12 @@ const form = document.getElementById("analyzeForm");
 const loading = document.getElementById("loading");
 const result = document.getElementById("result");
 
+/*
+  Backend is served from SAME domain
+  So API_BASE_URL is empty
+*/
+const API_BASE_URL = "";
+
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -24,23 +30,26 @@ form.addEventListener("submit", async (e) => {
     formData.append("file", imageFile);
 
     try {
-        // ✅ Vercel-compatible API call (relative path)
-        const response = await fetch("/analyze/image", {
+        const response = await fetch(`${API_BASE_URL}/analyze/image`, {
             method: "POST",
             body: formData
         });
 
         if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`Server error ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
 
+        // ------------------------------
+        // Update UI
+        // ------------------------------
         document.getElementById("disease").innerText =
             data.disease?.disease || "Unknown";
 
         document.getElementById("confidence").innerText =
-            data.disease?.confidence
+            data.disease?.confidence !== undefined
                 ? (data.disease.confidence * 100).toFixed(1) + "%"
                 : "N/A";
 
@@ -74,6 +83,6 @@ form.addEventListener("submit", async (e) => {
     } catch (err) {
         loading.classList.add("hidden");
         alert("Unable to analyze image. Please try again later.");
-        console.error("Analysis error:", err);
+        console.error("Analysis error:", err.message);
     }
 });
