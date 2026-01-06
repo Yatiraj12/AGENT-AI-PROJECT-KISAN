@@ -82,29 +82,58 @@ ensure_directory(UPLOAD_DIR)
 
 
 # -------------------------------------------------
-# History persistence helper (UNCHANGED)
+# Translation helpers (RE-ENABLED ✅)
 # -------------------------------------------------
-def save_history(
-    crop: str,
-    disease_result: dict,
-    severity_result: dict,
-    image_path: str | None = None
-):
-    db = SessionLocal()
-    try:
-        record = AnalysisHistory(
-            crop=crop,
-            disease=disease_result.get("disease"),
-            confidence=disease_result.get("confidence"),
-            severity_percent=severity_result.get("severity_percent"),
-            risk_level=severity_result.get("risk_level"),
-            explanation=disease_result.get("explanation"),
-            image_path=image_path
-        )
-        db.add(record)
-        db.commit()
-    finally:
-        db.close()
+def translate_text(text: str, language: str) -> str:
+    if not text or language == "en":
+        return text
+
+    messages = [
+        {
+            "role": "system",
+            "content": "You are an agricultural expert translating content for farmers."
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Translate the following agricultural explanation into {language}. "
+                f"Keep it simple and farmer-friendly:\n\n{text}"
+            )
+        }
+    ]
+
+    response = llm_service.generate(messages)
+    return response.get("raw_response", text)
+
+
+def translate_list(items: list[str], language: str) -> list[str]:
+    if not items or language == "en":
+        return items
+
+    joined_text = "\n".join(f"- {item}" for item in items)
+
+    messages = [
+        {
+            "role": "system",
+            "content": "You are translating agricultural instructions for farmers."
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Translate the following steps into {language}. "
+                f"Keep them clear and actionable:\n\n{joined_text}"
+            )
+        }
+    ]
+
+    response = llm_service.generate(messages)
+    translated_text = response.get("raw_response", joined_text)
+
+    return [
+        line.strip("- ").strip()
+        for line in translated_text.split("\n")
+        if line.strip()
+    ]
 
 
 # =================================================
@@ -124,21 +153,14 @@ async def analyze_disease_from_image(
     unique_filename = f"{uuid.uuid4()}{file_extension}"
     file_path = os.path.join(UPLOAD_DIR, unique_filename)
 
-    # -------------------------
-    # SAFE FILE SAVE (UNCHANGED)
-    # -------------------------
+    # Save image safely
     try:
         file_bytes = await file.read()
         save_uploaded_file(file_bytes, file_path)
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Image save failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Image save failed: {str(e)}")
 
-    # -------------------------------------------------
-    # UPDATE 1: BYPASS IMAGE PREPROCESSOR (TEMP) ✅ FIXED
-    # -------------------------------------------------
+    # TEMP visual features (working)
     visual_features = {
         "leaf_color": "green",
         "spots": "yes",
@@ -148,6 +170,12 @@ async def analyze_disease_from_image(
     disease_result = disease_agent.detect_disease(
         crop=crop,
         visual_features=visual_features
+    )
+
+    # ✅ TRANSLATE EXPLANATION
+    disease_result["explanation"] = translate_text(
+        disease_result.get("explanation"),
+        language
     )
 
     severity_result = severity_agent.estimate_severity(
@@ -160,15 +188,16 @@ async def analyze_disease_from_image(
         severity_info=severity_result
     )
 
-    # -------------------------------------------------
-    # UPDATE 2: DISABLE DB SAVE (TEMP)
-    # -------------------------------------------------
-    # save_history(
-    #     crop=crop,
-    #     disease_result=disease_result,
-    #     severity_result=severity_result,
-    #     image_path=file_path
-    # )
+    # ✅ TRANSLATE SOLUTION
+    solution_result["treatment"] = translate_list(
+        solution_result.get("treatment", []),
+        language
+    )
+
+    solution_result["prevention"] = translate_list(
+        solution_result.get("prevention", []),
+        language
+    )
 
     return DiseaseAnalysisResponse(
         crop=crop,
