@@ -3,8 +3,7 @@ const loading = document.getElementById("loading");
 const result = document.getElementById("result");
 
 /*
-  Backend is served from SAME domain
-  So API_BASE_URL is empty
+  Backend and frontend are on the SAME domain
 */
 const API_BASE_URL = "";
 
@@ -36,15 +35,13 @@ form.addEventListener("submit", async (e) => {
         });
 
         if (!response.ok) {
+            // READ REAL BACKEND ERROR
             const errorText = await response.text();
-            throw new Error(`Server error ${response.status}: ${errorText}`);
+            throw new Error(errorText);
         }
 
         const data = await response.json();
 
-        // ------------------------------
-        // Update UI
-        // ------------------------------
         document.getElementById("disease").innerText =
             data.disease?.disease || "Unknown";
 
@@ -82,7 +79,10 @@ form.addEventListener("submit", async (e) => {
 
     } catch (err) {
         loading.classList.add("hidden");
-        alert("Unable to analyze image. Please try again later.");
-        console.error("Analysis error:", err.message);
+
+        //  SHOW EXACT BACKEND ERROR
+        alert("Backend error:\n\n" + err.message);
+
+        console.error("Analysis error (FULL):", err);
     }
 });
