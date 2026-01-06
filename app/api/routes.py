@@ -137,11 +137,11 @@ async def analyze_disease_from_image(
         )
 
     # -------------------------------------------------
-    # 🔴 UPDATE 1: BYPASS IMAGE PREPROCESSOR (TEMP)
+    # UPDATE 1: BYPASS IMAGE PREPROCESSOR (TEMP) ✅ FIXED
     # -------------------------------------------------
     visual_features = {
         "leaf_color": "green",
-        "spots": True,
+        "spots": "yes",
         "texture": "rough"
     }
 
@@ -161,7 +161,7 @@ async def analyze_disease_from_image(
     )
 
     # -------------------------------------------------
-    # 🔴 UPDATE 2: DISABLE DB SAVE (TEMP)
+    # UPDATE 2: DISABLE DB SAVE (TEMP)
     # -------------------------------------------------
     # save_history(
     #     crop=crop,
