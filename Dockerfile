@@ -4,7 +4,8 @@ WORKDIR /app
 ENV PYTHONPATH=/app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
 COPY requirements.txt .
@@ -17,6 +18,8 @@ RUN pip install --upgrade pip \
 # Copy application
 COPY . .
 
-EXPOSE 8000
+#  Render-required port
+EXPOSE 10000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# ONLY PORT CHANGED — app.main:app KEPT
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "10000"]
