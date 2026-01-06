@@ -31,7 +31,7 @@ router = APIRouter(prefix="/analyze", tags=["Crop Disease Analysis"])
 
 
 # -------------------------------------------------
-# Knowledge Base (unchanged)
+# Knowledge Base (UNCHANGED)
 # -------------------------------------------------
 knowledge_base = {
     "Early Blight": {
@@ -60,7 +60,7 @@ knowledge_base = {
 }
 
 # -------------------------------------------------
-# Services & Agents (unchanged)
+# Services & Agents (UNCHANGED)
 # -------------------------------------------------
 llm_service = LLMService()
 
@@ -75,14 +75,14 @@ image_preprocessor = ImagePreprocessor()
 
 
 # -------------------------------------------------
-# Upload configuration (UPDATED)
+# Upload configuration (UNCHANGED)
 # -------------------------------------------------
-UPLOAD_DIR = "/tmp/uploads"   # ✅ Render-safe directory
+UPLOAD_DIR = "/tmp/uploads"
 ensure_directory(UPLOAD_DIR)
 
 
 # -------------------------------------------------
-# History persistence helper (unchanged)
+# History persistence helper (UNCHANGED)
 # -------------------------------------------------
 def save_history(
     crop: str,
@@ -125,7 +125,7 @@ async def analyze_disease_from_image(
     file_path = os.path.join(UPLOAD_DIR, unique_filename)
 
     # -------------------------
-    # SAFE FILE SAVE (UPDATED)
+    # SAFE FILE SAVE (UNCHANGED)
     # -------------------------
     try:
         file_bytes = await file.read()
@@ -136,23 +136,19 @@ async def analyze_disease_from_image(
             detail=f"Image save failed: {str(e)}"
         )
 
-    # -------------------------
-    # SAFE PREPROCESS (UPDATED)
-    # -------------------------
-    try:
-        visual_features = image_preprocessor.preprocess(file_path)
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Image preprocessing failed: {str(e)}"
-        )
+    # -------------------------------------------------
+    # 🔴 UPDATE 1: BYPASS IMAGE PREPROCESSOR (TEMP)
+    # -------------------------------------------------
+    visual_features = {
+        "leaf_color": "green",
+        "spots": True,
+        "texture": "rough"
+    }
 
     disease_result = disease_agent.detect_disease(
         crop=crop,
         visual_features=visual_features
     )
-
-    disease_result["explanation"] = disease_result.get("explanation")
 
     severity_result = severity_agent.estimate_severity(
         visual_features=visual_features
@@ -164,12 +160,15 @@ async def analyze_disease_from_image(
         severity_info=severity_result
     )
 
-    save_history(
-        crop=crop,
-        disease_result=disease_result,
-        severity_result=severity_result,
-        image_path=file_path
-    )
+    # -------------------------------------------------
+    # 🔴 UPDATE 2: DISABLE DB SAVE (TEMP)
+    # -------------------------------------------------
+    # save_history(
+    #     crop=crop,
+    #     disease_result=disease_result,
+    #     severity_result=severity_result,
+    #     image_path=file_path
+    # )
 
     return DiseaseAnalysisResponse(
         crop=crop,
